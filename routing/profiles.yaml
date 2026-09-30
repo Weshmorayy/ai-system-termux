@@ -1,0 +1,195 @@
+# Task Routing Profiles
+# DSH selects a profile → FreeLLMAPI picks a healthy provider
+# Updated: 2026-09-22
+
+profiles:
+
+  brainstorming:
+    description: "Ideas, exploration, open-ended discussion"
+    require: []
+    weights:
+      general: high
+      speed: high
+      price: very_high
+    preferred_tier: 0-1
+    context_budget: small
+
+  architecture:
+    description: "System design, tech stack decisions, trade-offs"
+    require: []
+    weights:
+      reasoning: very_high
+      coding: high
+      speed: low
+      price: medium
+    preferred_tier: 2-3
+    context_budget: medium
+
+  scaffolding:
+    description: "New project init, boilerplate, repo structure"
+    require: [tool_calling]
+    weights:
+      coding: high
+      agentic: high
+      speed: high
+      price: high
+    preferred_tier: 1
+    context_budget: small
+
+  coding:
+    description: "Feature implementation, CRUD, APIs, frontend"
+    require: [tool_calling]
+    weights:
+      coding: very_high
+      agentic: high
+      speed: high
+      price: high
+    preferred_tier: 1-2
+    context_budget: medium
+
+  debugging:
+    description: "Bug investigation, error analysis, fixes"
+    require: [tool_calling]
+    weights:
+      coding: very_high
+      reasoning: high
+      agentic: high
+      speed: medium
+      price: medium
+    preferred_tier: 2
+    context_budget: medium
+
+  ui_recreation:
+    description: "Recreate a UI from a screenshot or design"
+    require: [vision, tool_calling]
+    weights:
+      vision: very_high
+      coding: high
+      speed: medium
+    preferred_tier: 1-2
+    context_budget: medium
+    vision_required: true
+
+  screenshot_debug:
+    description: "Diagnose visual bugs from screenshots"
+    require: [vision]
+    weights:
+      vision: very_high
+      coding: high
+    preferred_tier: 1-2
+    context_budget: small
+    vision_required: true
+
+  database_work:
+    description: "Schema design, migrations, RLS, queries"
+    require: [tool_calling]
+    weights:
+      coding: very_high
+      reasoning: high
+      speed: high
+      price: high
+    preferred_tier: 1-2
+    context_budget: medium
+
+  research:
+    description: "Web research, documentation lookup, analysis"
+    require: [web]
+    weights:
+      reasoning: high
+      general: high
+      speed: medium
+    preferred_tier: 1
+    context_budget: medium
+
+  documentation:
+    description: "Writing docs, README, comments, guides"
+    require: []
+    weights:
+      general: high
+      instruction_following: high
+      speed: high
+      price: very_high
+    preferred_tier: 0-1
+    context_budget: small
+
+  security_review:
+    description: "Security audit, secrets, auth, permissions"
+    require: []
+    weights:
+      reasoning: very_high
+      coding: high
+      speed: low
+      price: low
+    preferred_tier: 2-3
+    context_budget: medium
+
+  code_review:
+    description: "Review diff for bugs, style, architecture"
+    require: []
+    weights:
+      coding: high
+      reasoning: high
+      speed: medium
+    preferred_tier: 2
+    context_budget: medium
+
+  simple_edit:
+    description: "Single-file edits, renaming, formatting"
+    require: [tool_calling]
+    weights:
+      coding: medium
+      speed: very_high
+      price: very_high
+    preferred_tier: 0
+    context_budget: tiny
+
+  pdf_extraction:
+    description: "Extract structured text from PDFs/documents"
+    require: [vision]
+    weights:
+      vision: very_high
+      speed: high
+      price: high
+    preferred_tier: 0-1
+    vision_required: true
+    notes: "Prefer Mistral OCR 4 or Gemini PDF"
+
+  final_review:
+    description: "Critical review before completing major task"
+    require: []
+    weights:
+      reasoning: very_high
+      coding: very_high
+      speed: low
+      price: low
+    preferred_tier: 3
+    context_budget: large
+
+# Model tier definitions
+tiers:
+  0:
+    description: "Ultra-cheap / fast — file search, extraction, simple transforms"
+    examples: [gemini-2.5-flash-lite, cerebras-gpt-oss-120b]
+  1:
+    description: "Efficient coding — CRUD, simple frontend, tests, boilerplate"
+    examples: [gemini-2.5-flash, mercury-2.5, groq-llama-3.3-70b]
+  2:
+    description: "Strong coding / reasoning — debugging, architecture, refactors"
+    examples: [groq-qwen3.8-27b, gemini-2.5-flash]
+  3:
+    description: "Frontier — difficult architecture, complex debugging, final review"
+    examples: [gemini-2.5-pro]
+
+# Vision routing
+vision:
+  primary:
+    - gemini-2.5-flash     # best free multimodal overall
+    - groq-qwen3.8-27b     # fast vision + tool use; 3 images max
+    - nvidia-glm-5.3-flash # NVIDIA free multimodal
+  ocr_specialist:
+    - mistral-ocr-4        # best for document/PDF text extraction
+  text_only_fallback:
+    description: "Use only when no vision model available"
+    pipeline: "OCR → structured description → text model"
+    warning: "Visual fidelity reduced — user informed"
+

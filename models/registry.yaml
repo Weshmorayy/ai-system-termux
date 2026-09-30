@@ -1,0 +1,186 @@
+# Model Intelligence Registry
+# Last updated: 2026-09-22
+# Sources: AI-ENGINEERING-RESEARCH-SEPTEMBER-2026.md + provider docs
+# Refresh: ai-models refresh (queries Artificial Analysis + PublicAI)
+
+meta:
+  version: "1"
+  updated: "2026-09-22"
+  refresh_interval_hours: 24
+
+models:
+
+  # ─── INCEPTION LABS ───────────────────────────────────────
+  - id: mercury-2.5
+    provider: inception
+    name: Inception Mercury 2.5
+    context_window: 260000
+    max_output: 65536
+    vision: false
+    tool_calling: true
+    structured_output: true
+    reasoning: true
+    coding_score: UNKNOWN
+    agentic_score: UNKNOWN
+    reasoning_score: UNKNOWN
+    speed_tps: UNKNOWN
+    latency: UNKNOWN
+    free: true
+    quota_confidence: UNKNOWN
+    notes: "Diffusion-based LLM; very fast streaming"
+
+  - id: mercury-2
+    provider: inception
+    name: Inception Mercury 2
+    context_window: 128000
+    max_output: 50000
+    vision: false
+    tool_calling: true
+    structured_output: true
+    reasoning: false
+    free: true
+    quota_confidence: UNKNOWN
+
+  # ─── GOOGLE GEMINI ────────────────────────────────────────
+  - id: gemini-2.5-flash
+    provider: google
+    name: Gemini 2.5 Flash
+    context_window: 1000000
+    max_output: 8192
+    vision: true
+    tool_calling: true
+    structured_output: true
+    reasoning: true
+    coding_score: HIGH
+    agentic_score: HIGH
+    reasoning_score: HIGH
+    vision_score: HIGH
+    free: true
+    quota_confidence: VERIFIED
+    quota_rpm: 15
+    quota_rpd: 1500
+    notes: "Best free multimodal; 1M context; PDF/image/video/audio"
+
+  - id: gemini-2.5-flash-lite
+    provider: google
+    name: Gemini 2.5 Flash Lite
+    context_window: 1000000
+    max_output: 8192
+    vision: true
+    tool_calling: true
+    structured_output: true
+    reasoning: false
+    free: true
+    quota_confidence: VERIFIED
+    notes: "Cheaper/faster Flash variant; still multimodal"
+
+  # ─── GROQ ─────────────────────────────────────────────────
+  - id: qwen3.8-27b
+    provider: groq
+    name: Qwen 3.8 27B (Groq)
+    context_window: 131072
+    max_output: 8192
+    vision: true
+    tool_calling: true
+    structured_output: true
+    reasoning: true
+    free: true
+    quota_confidence: VERIFIED
+    quota_rpm: 30
+    notes: "Best free vision on Groq; up to 3 images/req; deprecated qwen3.6-27b Sep 14 2026"
+
+  - id: llama-3.3-70b
+    provider: groq
+    name: Llama 3.3 70B (Groq)
+    context_window: 128000
+    max_output: 8192
+    vision: false
+    tool_calling: true
+    reasoning: false
+    free: true
+    quota_confidence: VERIFIED
+    coding_score: HIGH
+    speed_tps: VERY_HIGH
+    notes: "Fast text/coding model"
+
+  # ─── CEREBRAS ─────────────────────────────────────────────
+  - id: gpt-oss-120b
+    provider: cerebras
+    name: GPT-OSS 120B (Cerebras)
+    context_window: 8192
+    max_output: 4096
+    vision: false
+    tool_calling: true
+    free: true
+    quota_confidence: VERIFIED
+    quota_tpm: 64000
+    quota_tpd: 1000000
+    quota_rpm: 30
+    quota_rpd: 14400
+    speed_tps: VERY_HIGH
+    notes: "Extremely fast inference; low context window"
+
+  - id: qwen-3-235b-a22b
+    provider: cerebras
+    name: Qwen 3 235B A22B (Cerebras)
+    context_window: 8192
+    vision: false
+    tool_calling: true
+    free: true
+    quota_confidence: VERIFIED
+    quota_tpm: 60000
+    quota_tpd: 1000000
+    speed_tps: VERY_HIGH
+    notes: "MoE model; very fast on Cerebras silicon"
+
+  # ─── NVIDIA ───────────────────────────────────────────────
+  - id: glm-5.3-flash
+    provider: nvidia
+    name: GLM-5.3-Flash (NVIDIA)
+    context_window: 128000
+    vision: true
+    tool_calling: true
+    free: true
+    quota_confidence: UNKNOWN
+    notes: "Free multimodal on NVIDIA Build; dynamic quota"
+
+  # ─── MISTRAL ──────────────────────────────────────────────
+  - id: mistral-ocr-4
+    provider: mistral
+    name: Mistral OCR 4
+    vision: true
+    tool_calling: false
+    free: true
+    quota_confidence: UNKNOWN
+    notes: "Specialized OCR; bounding boxes + confidence; best for document extraction"
+
+  - id: mistral-small-4
+    provider: mistral
+    name: Mistral Small 4
+    context_window: 128000
+    vision: false
+    tool_calling: true
+    free: true
+    quota_confidence: UNKNOWN
+    notes: "Efficient general model"
+
+  # ─── CLOUDFLARE ───────────────────────────────────────────
+  - id: "@cf/qwen/qwen3.8-27b-fp8-fast"
+    provider: cloudflare
+    name: Qwen 3.8 27B (Cloudflare)
+    context_window: 128000
+    vision: true
+    tool_calling: true
+    free: true
+    quota_confidence: ESTIMATED
+    notes: "Free via Workers AI Neurons (10K/day); resets 00:00 UTC"
+
+  - id: "@cf/meta/llama-4-scout-17b-16e-instruct"
+    provider: cloudflare
+    name: Llama 4 Scout (Cloudflare)
+    vision: true
+    tool_calling: true
+    free: true
+    quota_confidence: ESTIMATED
+    notes: "Vision-capable; Neurons budget"
+

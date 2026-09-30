@@ -1,0 +1,69 @@
+# MCP Servers — Recommended Installation
+# Based on: AI-ENGINEERING-RESEARCH-SEPTEMBER-2026.md §13
+# Install MCPs individually as needed — do NOT install all at once
+
+recommended:
+
+  publicai-index:
+    purpose: "Cross-benchmark model intelligence (coding/reasoning/vision/agentic ranks)"
+    mcp_url: "https://publicai.io/model-index/mcp"
+    key_required: false
+    install: "Add to DSH MCP config — no local install needed (remote HTTP MCP)"
+    value: VERY_HIGH
+    context_cost: LOW
+    status: NOT_YET_CONFIGURED
+    notes: "No API key required. Use for: which model is best for this task?"
+
+  context7:
+    purpose: "Current version-specific library documentation (reduces hallucination)"
+    mcp_url: "https://mcp.context7.com/mcp"
+    key_required: false
+    install: "Add to DSH MCP config"
+    value: HIGH
+    context_cost: MEDIUM
+    status: NOT_YET_CONFIGURED
+    notes: "Invoke only when current external library docs needed"
+
+  github:
+    purpose: "GitHub issues, PRs, repos, code search"
+    package: "@github/github-mcp-server"
+    key_required: true
+    key_env: GITHUB_TOKEN
+    value: HIGH
+    context_cost: MEDIUM
+    status: NOT_YET_CONFIGURED
+    notes: "Install if using GitHub for projects"
+
+  supabase:
+    purpose: "DB schema, migrations, SQL, logs, TypeScript types, advisors"
+    mcp_url: "https://mcp.supabase.com"
+    key_required: true
+    key_env: SUPABASE_ACCESS_TOKEN
+    value: VERY_HIGH
+    context_cost: MEDIUM
+    security: HIGH
+    default_mode: "read_only=true, project-scoped"
+    status: NOT_YET_CONFIGURED
+    notes: "Enable writes ONLY for deliberate DB tasks. Project-scope always."
+
+  playwright:
+    purpose: "Browser automation, UI testing, accessibility snapshots"
+    package: "@playwright/mcp"
+    key_required: false
+    value: VERY_HIGH
+    context_cost: MEDIUM
+    security: HIGH
+    status: NOT_YET_CONFIGURED
+    notes: "Best for web UI debugging without vision model. Enable per-project."
+
+not_recommended:
+  - filesystem_mcp: "DSH already has filesystem tools — duplicates context overhead"
+  - generic_postgres: "Use Supabase MCP if on Supabase; otherwise direct DB connection"
+  - multiple_browser_mcps: "Pick one (Playwright preferred)"
+  - multiple_benchmark_mcps: "PublicAI aggregates what you need"
+
+how_to_add_mcp_to_dsh: |
+  Add to ~/.dsh/profiles/web/cordis.patch.yml under the plugins section.
+  Example for PublicAI (remote HTTP MCP, no install):
+    - name: mcp-publicai
+      url: https://publicai.io/model-index/mcp

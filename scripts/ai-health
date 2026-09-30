@@ -1,0 +1,43 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Quick provider health check — pings each configured provider
+echo ""
+echo "PROVIDER HEALTH CHECK — $(date '+%Y-%m-%d %H:%M')"
+echo ""
+
+check_provider() {
+  local name="$1" url="$2" auth_header="$3"
+  local result
+  if [ -n "$auth_header" ]; then
+    result=$(curl -s -o /dev/null -w "%{http_code}" --max-time 8 -H "$auth_header" "$url" 2>/dev/null)
+  else
+    result=$(curl -s -o /dev/null -w "%{http_code}" --max-time 8 "$url" 2>/dev/null)
+  fi
+  if [ "$result" = "200" ] || [ "$result" = "401" ]; then
+    echo "  ✓ $name (HTTP $result)"
+  elif [ -z "$result" ]; then
+    echo "  ✗ $name (timeout/unreachable)"
+  else
+    echo "  ? $name (HTTP $result)"
+  fi
+}
+
+echo "▸ Local"
+FLLM_KEY="freellmapi-71ad8153feaf0accfde99e05d2e22fc792e59be02673ffdd"
+curl -s http://localhost:3001/health -H "Authorization: Bearer $FLLM_KEY" &>/dev/null \
+  && echo "  ✓ FreeLLMAPI (localhost:3001)" || echo "  ✗ FreeLLMAPI (not running)"
+
+echo ""
+echo "▸ Providers"
+check_provider "Google Gemini" "https://generativelanguage.googleapis.com/v1beta/models" \
+  "x-goog-api-key: ${GOOGLE_API_KEY:-missing}"
+check_provider "Groq" "https://api.groq.com/openai/v1/models" \
+  "Authorization: Bearer ${GROQ_API_KEY:-missing}"
+check_provider "Inception" "https://api.inceptionlabs.ai/v1/models" \
+  "Authorization: Bearer ${INCEPTION_API_KEY:-missing}"
+check_provider "NVIDIA" "https://integrate.api.nvidia.com/v1/models" \
+  "Authorization: Bearer ${NVIDIA_API_KEY:-missing}"
+check_provider "Mistral" "https://api.mistral.ai/v1/models" \
+  "Authorization: Bearer ${MISTRAL_API_KEY:-missing}"
+check_provider "OpenRouter" "https://openrouter.ai/api/v1/models" \
+  "Authorization: Bearer ${OPENROUTER_API_KEY:-missing}"
+echo ""

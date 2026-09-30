@@ -1,0 +1,34 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Start FreeLLMAPI provider gateway
+# API: http://localhost:3001
+# Dashboard: http://localhost:5173
+# FreeLLMAPI v0.6.0 (global npm install — no local server clone needed)
+
+FLLM_KEY="${FREELLMAPI_KEY:-freellmapi-71ad8153feaf0accfde99e05d2e22fc792e59be02673ffdd}"
+LOGFILE="$HOME/.local/share/freellmapi/server.log"
+
+if curl -s --max-time 1 -H "Authorization: Bearer $FLLM_KEY" http://127.0.0.1:3001/v1/models &>/dev/null 2>&1; then
+  echo "FreeLLMAPI already running at http://localhost:3001"
+  exit 0
+fi
+
+echo "Starting FreeLLMAPI..."
+mkdir -p "$HOME/.local/share/freellmapi"
+nohup freellmapi serve >> "$LOGFILE" 2>&1 &
+disown $!
+echo "PID: $!"
+
+sleep 4
+if curl -s --max-time 2 -H "Authorization: Bearer $FLLM_KEY" http://127.0.0.1:3001/v1/models &>/dev/null 2>&1; then
+  echo "✓ FreeLLMAPI running — http://localhost:3001"
+  echo "  Dashboard — http://localhost:5173"
+else
+  echo "Waiting a bit more..."
+  sleep 4
+  if curl -s --max-time 2 -H "Authorization: Bearer $FLLM_KEY" http://127.0.0.1:3001/v1/models &>/dev/null 2>&1; then
+    echo "✓ FreeLLMAPI running"
+  else
+    echo "✗ Failed to start — check $LOGFILE"
+    echo "  Try: freellmapi serve"
+  fi
+fi

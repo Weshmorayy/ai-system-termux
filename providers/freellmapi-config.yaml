@@ -1,0 +1,43 @@
+# FreeLLMAPI Gateway Config
+# Server: http://localhost:3001
+# Dashboard: http://localhost:5173
+# Start with: freellmapi-start (or ai-freellmapi)
+# API Key: stored in ~/.dsh/.credentials.yaml as FREELLMAPI_KEY
+
+setup_code: "UA67DUEEVF"   # First-run web setup code (one-time)
+unified_endpoint: "http://localhost:3001/v1"
+version: "0.6.0 (server) / v0.11.1 (repo)"
+installed: "2026-09-22"
+reinstalled: "2026-09-30"
+data_dir: "/data/data/com.termux/files/home/freellmapi/server/data"
+db: "/data/data/com.termux/files/home/freellmapi/server/data/freeapi.db"
+
+# ─── PROVIDERS ───────────────────────────────────────────────────────────────
+# Add each provider key via FreeLLMAPI dashboard (http://localhost:5173)
+# or via the FreeLLMAPI API on first run.
+
+providers:
+  inception:
+    name: "Inception Labs"
+    base_url: "https://api.inceptionlabs.ai/v1"
+    key_env: "INCEPTION_API_KEY"
+    # key stored in ~/.dsh/.credentials.yaml
+    chat_endpoint: "https://api.inceptionlabs.ai/v1/chat/completions"
+    models_endpoint: "https://api.inceptionlabs.ai/v1/models"
+    openai_compatible: true
+    models:
+      - id: mercury-2.5
+        context_window: 260000
+        max_output: 65536
+        vision: false
+        tool_calling: true
+        reasoning: true
+        notes: "Diffusion-based LLM; fastest streaming; 260K context"
+      - id: mercury-2
+        context_window: 128000
+        max_output: 50000
+        vision: false
+        tool_calling: true
+        reasoning: false
+        notes: "Diffusion-based LLM; standard variant"
+    added: "2026-09-30"

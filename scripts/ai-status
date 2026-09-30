@@ -1,0 +1,48 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# AI System Status Dashboard
+# Usage: ai-status
+
+echo ""
+echo "╔════════════════════════════════════════╗"
+echo "║        AI ENGINEERING SYSTEM           ║"
+echo "║        Status: $(date '+%Y-%m-%d %H:%M')        ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+
+# DSH
+echo "▸ DeepSeek Harness"
+if dsh --version &>/dev/null; then
+  echo "  ✓ dsh $(dsh --version 2>&1 | head -1)"
+else
+  echo "  ✗ dsh not found"
+fi
+
+# FreeLLMAPI
+echo ""
+echo "▸ FreeLLMAPI"
+if curl -s http://localhost:3001/health &>/dev/null 2>&1; then
+  HEALTH=$(curl -s http://localhost:3001/health 2>/dev/null)
+  echo "  ✓ Running — http://localhost:3001"
+  echo "  ✓ Dashboard — http://localhost:5173"
+else
+  echo "  ✗ Not running"
+  echo "  → Start: cd ~/freellmapi && ~/AI_SYSTEM/scripts/freellmapi-start"
+fi
+
+# Node
+echo ""
+echo "▸ Runtime"
+echo "  Node: $(node --version 2>/dev/null || echo 'not found')"
+echo "  NPM:  $(npm --version 2>/dev/null || echo 'not found')"
+
+# Memory
+echo ""
+echo "▸ Device"
+free -h 2>/dev/null | awk 'NR==2{printf "  RAM: %s used / %s total (avail: %s)\n", $3, $2, $7}'
+df -h ~ 2>/dev/null | awk 'NR==2{printf "  Storage: %s used / %s total (%s free)\n", $3, $2, $4}'
+
+echo ""
+echo "  Run 'ai-models' for model table"
+echo "  Run 'ai-quota'  for quota status"
+echo "  Run 'dsh-start' to launch DSH web UI"
+echo ""

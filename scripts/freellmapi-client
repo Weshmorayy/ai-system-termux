@@ -1,0 +1,9 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Start FreeLLMAPI dashboard client (Vite dev server)
+# Dashboard: http://localhost:5173
+BINDIR="$HOME/freellmapi/node_modules/.bin"
+cd "$HOME/freellmapi/client"
+nohup "$BINDIR/vite" --host 0.0.0.0 --port 5173 > "$HOME/freellmapi/client.log" 2>&1 &
+echo "Dashboard starting at http://localhost:5173 (PID: $!)"
+sleep 3
+termux-open-url "http://localhost:5173" 2>/dev/null || echo "Open in browser: http://localhost:5173"

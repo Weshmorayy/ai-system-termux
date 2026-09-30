@@ -1,0 +1,108 @@
+# Quota State
+# Confidence levels: VERIFIED | ESTIMATED | COMMUNITY_REPORTED | UNKNOWN
+# Updated automatically by: ai-quota command (reads FreeLLMAPI + provider headers)
+# This file: human-readable summary only; runtime state lives in FreeLLMAPI DB
+
+meta:
+  updated: "2026-09-22"
+  note: "Dynamic quota; rerun ai-quota for current state"
+
+providers:
+
+  google:
+    key: GOOGLE_API_KEY
+    models:
+      gemini-2.5-flash:
+        rpm: {limit: 15, confidence: VERIFIED, source: "ai.google.dev/gemini-api/docs/rate-limits"}
+        rpd: {limit: 1500, confidence: VERIFIED}
+        tpm: {limit: 1000000, confidence: VERIFIED}
+        reset: "midnight Pacific Time"
+        data_use_for_training: "free tier may be used to improve Google products"
+        commercial_use: true
+      gemini-2.5-flash-lite:
+        rpm: {limit: 30, confidence: VERIFIED}
+        rpd: {limit: 1500, confidence: VERIFIED}
+        reset: "midnight Pacific Time"
+    status: AVAILABLE
+    notes: "Best free multimodal. Strongly recommended for vision tasks."
+
+  groq:
+    key: GROQ_API_KEY
+    quota_headers: true
+    notes: "Exposes x-ratelimit-* headers — most observable free provider"
+    models:
+      qwen3.8-27b:
+        rpm: {limit: 30, confidence: VERIFIED, source: "console.groq.com/docs/rate-limits"}
+        tpm: {limit: 8000, confidence: VERIFIED}
+        rpd: {limit: 1000, confidence: COMMUNITY_REPORTED}
+        vision: true
+        max_images_per_request: 3
+        deprecated_model: "qwen3.6-27b deprecated Sep 14 2026"
+      llama-3.3-70b:
+        rpm: {limit: 30, confidence: VERIFIED}
+        tpm: {limit: 6000, confidence: COMMUNITY_REPORTED}
+    status: AVAILABLE
+
+  inception:
+    key: INCEPTION_API_KEY
+    models:
+      mercury-2.5:
+        quota: {confidence: UNKNOWN}
+      mercury-2:
+        quota: {confidence: UNKNOWN}
+    status: AVAILABLE
+    notes: "Diffusion-based; fast streaming"
+
+  cerebras:
+    key: CEREBRAS_API_KEY
+    models:
+      gpt-oss-120b:
+        tpm: {limit: 64000, confidence: VERIFIED, source: "inference-docs.cerebras.ai/support/rate-limits"}
+        tph: {limit: 1000000, confidence: VERIFIED}
+        tpd: {limit: 1000000, confidence: VERIFIED}
+        rpm: {limit: 30, confidence: VERIFIED}
+        rpd: {limit: 14400, confidence: VERIFIED}
+      qwen-3-235b-a22b:
+        tpm: {limit: 60000, confidence: VERIFIED}
+        tpd: {limit: 1000000, confidence: VERIFIED}
+        rpm: {limit: 30, confidence: VERIFIED}
+        rpd: {limit: 14400, confidence: VERIFIED}
+    status: UNKNOWN
+    notes: "No CEREBRAS_API_KEY configured yet"
+
+  nvidia:
+    key: NVIDIA_API_KEY
+    models:
+      glm-5.3-flash:
+        quota: {confidence: UNKNOWN}
+        vision: true
+    status: AVAILABLE
+    notes: "Dynamic free endpoint quotas; ~38 free endpoints Sep 2026"
+
+  mistral:
+    key: MISTRAL_API_KEY
+    models:
+      mistral-ocr-4:
+        quota: {confidence: UNKNOWN, source: "docs.mistral.ai"}
+        notes: "Best OCR; structured text + bounding boxes"
+      mistral-small-4:
+        quota: {confidence: UNKNOWN}
+    status: UNKNOWN
+    notes: "No MISTRAL_API_KEY configured yet; free tier requires account"
+
+  cloudflare:
+    key: CF_API_TOKEN
+    models:
+      qwen3.8-27b:
+        daily_neurons: {limit: 10000, confidence: VERIFIED, source: "developers.cloudflare.com/workers-ai/platform/pricing/"}
+        reset: "00:00 UTC"
+        vision: true
+    status: UNKNOWN
+    notes: "No CF token configured yet; Workers AI Neurons-based billing"
+
+  openrouter:
+    key: OPENROUTER_API_KEY
+    free_requests_per_day: {limit: 50, confidence: VERIFIED, source: "openrouter.ai/pricing"}
+    notes: "Only 50 req/day free; use as fallback for rare models"
+    status: UNKNOWN
+

@@ -1,0 +1,62 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# AI Models — show model table with benchmark/capability data
+# Usage: ai-models [refresh]
+
+REGISTRY="$HOME/AI_SYSTEM/models/registry.yaml"
+
+if [ "$1" = "refresh" ]; then
+  echo "Refreshing model intelligence from PublicAI Index..."
+  # Query PublicAI MCP JSON endpoint
+  RESULT=$(curl -s "https://publicai.io/model-index/api" 2>/dev/null | head -c 4096)
+  if [ -n "$RESULT" ]; then
+    echo "PublicAI response received. Update registry.yaml manually with current data."
+    echo "$RESULT" | python3 -c "
+import json,sys
+try:
+    d = json.load(sys.stdin)
+    print(f'PublicAI: {len(d)} entries')
+except: print('Could not parse response')
+" 2>/dev/null
+  else
+    echo "Could not reach PublicAI — using cached registry"
+  fi
+  echo ""
+fi
+
+echo ""
+echo "MODEL TABLE  (from ~/AI_SYSTEM/models/registry.yaml)"
+echo "Updated: 2026-09-22 | Source: AI-ENGINEERING-RESEARCH + provider docs"
+echo ""
+printf "%-28s %-12s %-8s %-8s %-7s %-8s %-6s\n" "MODEL" "PROVIDER" "CODING" "VISION" "TOOLS" "CTX" "FREE"
+echo "------------------------------------------------------------------------------------"
+
+python3 << 'PYEOF'
+import yaml, sys, os
+
+reg_path = os.path.expanduser("~/AI_SYSTEM/models/registry.yaml")
+try:
+    with open(reg_path) as f:
+        data = yaml.safe_load(f)
+    models = data.get("models", [])
+except Exception as e:
+    print(f"Could not load registry: {e}")
+    sys.exit(1)
+
+for m in models:
+    mid = m.get("id","?")[:27]
+    provider = m.get("provider","?")[:11]
+    coding = m.get("coding_score","?")[:7] if m.get("coding_score") else "-"
+    vision = "YES" if m.get("vision") else "no"
+    tools = "YES" if m.get("tool_calling") else "no"
+    ctx = m.get("context_window","?")
+    if isinstance(ctx, int):
+        ctx = f"{ctx//1000}K" if ctx >= 1000 else str(ctx)
+    ctx = str(ctx)[:7]
+    free = "FREE" if m.get("free") else "PAID"
+    print(f"{mid:<28} {provider:<12} {coding:<8} {vision:<8} {tools:<7} {ctx:<8} {free}")
+PYEOF
+
+echo ""
+echo "Run: ai-models refresh   — to fetch latest from PublicAI Index"
+echo "Edit: ~/AI_SYSTEM/models/registry.yaml   — to update manually"
+echo ""

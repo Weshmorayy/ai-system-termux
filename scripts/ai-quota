@@ -1,0 +1,42 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# AI Quota Status
+# Reads FreeLLMAPI health + local state.yaml
+
+FLLM_KEY="freellmapi-71ad8153feaf0accfde99e05d2e22fc792e59be02673ffdd"
+FLLM_URL="http://localhost:3001"
+
+echo ""
+echo "QUOTA STATUS — $(date '+%Y-%m-%d %H:%M')"
+echo "Confidence: VERIFIED=provider headers | ESTIMATED=local calc | UNKNOWN=no data"
+echo ""
+
+# FreeLLMAPI status
+if curl -s "$FLLM_URL/health" -H "Authorization: Bearer $FLLM_KEY" &>/dev/null 2>&1; then
+  echo "▸ FreeLLMAPI Gateway: ONLINE"
+  MODELS=$(curl -s "$FLLM_URL/v1/models" -H "Authorization: Bearer $FLLM_KEY" 2>/dev/null \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',[])))" 2>/dev/null)
+  echo "  Models available: ${MODELS:-unknown}"
+  echo "  Dashboard: http://localhost:5173"
+else
+  echo "▸ FreeLLMAPI Gateway: OFFLINE"
+  echo "  Start: ~/AI_SYSTEM/scripts/freellmapi-start"
+fi
+
+echo ""
+echo "▸ Provider Limits (from AI-ENGINEERING-RESEARCH-SEPTEMBER-2026, verified sources)"
+echo ""
+echo "  Google Gemini 2.5 Flash  → 15 RPM / 1500 RPD / 1M TPM (VERIFIED)"
+echo "  Google Gemini 2.5 Flash Lite → 30 RPM / 1500 RPD (VERIFIED)"
+echo "  Groq Qwen 3.8 27B        → 30 RPM / 8K TPM (VERIFIED, vision OK)"
+echo "  Groq Llama 3.3 70B       → 30 RPM (VERIFIED)"
+echo "  Cerebras GPT-OSS 120B    → 30 RPM / 64K TPM / 1M TPD (VERIFIED)"
+echo "  Cerebras Qwen 3 235B     → 30 RPM / 60K TPM / 1M TPD (VERIFIED)"
+echo "  OpenRouter free          → 50 req/day total (VERIFIED)"
+echo "  Cloudflare Workers AI    → 10K Neurons/day, resets 00:00 UTC (VERIFIED)"
+echo "  Inception Mercury 2.5    → UNKNOWN"
+echo "  NVIDIA free endpoints    → UNKNOWN (dynamic)"
+echo "  Mistral                  → UNKNOWN (account-dependent)"
+echo ""
+echo "Note: FreeLLMAPI tracks per-key usage in real-time via its dashboard."
+echo "      For live remaining quota: open http://localhost:5173 after freellmapi-start"
+echo ""
