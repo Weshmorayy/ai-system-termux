@@ -1,0 +1,63 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# dsh-start — launch FreeLLMAPI + DeepSeek Harness Web UI with structured links
+
+export FREELLMAPI_KEY="${FREELLMAPI_KEY:-freellmapi-71ad8153feaf0accfde99e05d2e22fc792e59be02673ffdd}"
+
+echo ""
+echo "============================================================"
+echo "🚀 Starting AI Engineering System & DeepSeek Harness"
+echo "============================================================"
+
+# 1. Start FreeLLMAPI Gateway & Dashboard
+if command -v freellmapi-start >/dev/null 2>&1; then
+  freellmapi-start
+elif [ -x "$HOME/AI_SYSTEM/scripts/freellmapi-start" ]; then
+  "$HOME/AI_SYSTEM/scripts/freellmapi-start"
+fi
+
+echo ""
+echo "------------------------------------------------------------"
+echo "  ► FreeLLMAPI API:       http://localhost:3001/v1"
+echo "  ► FreeLLMAPI Dashboard: http://localhost:5173"
+echo "  ► FreeLLMAPI Repo:      https://github.com/Weshmorayy/freellmapi-termux"
+echo "------------------------------------------------------------"
+echo ""
+
+# 2. Launch DSH web UI with --no-open to prevent unauthenticated browser popup.
+#    Captures the authenticated token URL, displays it formatted, and opens it via termux-open-url.
+
+exec node --input-type=module - "$@" << 'JS_EOF'
+import { spawn } from 'node:child_process';
+import readline from 'node:readline';
+
+const args = ['web', '--no-open', ...process.argv.slice(2)];
+const dsh = spawn('dsh', args, { stdio: ['inherit', 'pipe', 'inherit'] });
+
+let opened = false;
+const rl = readline.createInterface({ input: dsh.stdout });
+
+rl.on('line', (line) => {
+  const match = line.match(/(http:\/\/(?:127\.0\.0\.1|localhost):\d+\/\?token=[^\s]+)/);
+  if (match && !opened) {
+    opened = true;
+    const tokenUrl = match[1];
+    console.log('============================================================');
+    console.log('  🔥 DEEPSEEK HARNESS WEB UI READY');
+    console.log(`  🌐 Web UI Link: ${tokenUrl}`);
+    console.log('============================================================\n');
+    
+    try {
+      const proc = spawn('termux-open-url', [tokenUrl], { stdio: 'ignore', detached: true });
+      proc.unref();
+    } catch (e) {
+      // Ignore fallback
+    }
+  } else {
+    console.log(line);
+  }
+});
+
+dsh.on('exit', (code) => {
+  process.exit(code ?? 0);
+});
+JS_EOF
