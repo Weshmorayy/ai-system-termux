@@ -21,6 +21,12 @@ fi
 echo "Starting FreeLLMAPI..."
 mkdir -p "$HOME/.local/share/freellmapi"
 
+# 1. Sync OpenRouter's free models into the FreeLLMAPI catalog.
+#    Non-fatal: a dead network or a rotated key logs one line and the gateway
+#    still starts on the last-known-good catalog. Rate-limited to 12h.
+echo "  ► Syncing OpenRouter free models..."
+python3 "$HOME/AI_SYSTEM/scripts/sync_openrouter_free_models.py" || true
+
 # Start server (workspace)
 cd "$REPO"
 nohup npm run dev -w server >> "$LOGFILE" 2>&1 &

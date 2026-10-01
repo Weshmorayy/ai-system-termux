@@ -45,6 +45,7 @@ Google Groq Cerebras Mistral  NVIDIA   Cloudflare
 | Workflows | ~/AI_SYSTEM/workflows/ | Repeatable processes |
 | Scripts | ~/AI_SYSTEM/scripts/ | CLI tools |
 | OpenRouter refresh | ~/AI_SYSTEM/scripts/refresh-openrouter-models.mjs | Keeps the DSH OpenRouter model list current (see [docs](docs/openrouter-model-refresh.md)) |
+| FreeLLMAPI free sync | ~/AI_SYSTEM/scripts/sync_openrouter_free_models.py | Pulls OpenRouter's zero-priced models into FreeLLMAPI (see [docs](docs/freellmapi-openrouter-sync.md)) |
 
 ---
 

@@ -10,3 +10,6 @@
 # Local backup copies of tracked scripts (may embed inline defaults)
 *.bak
 *.bak-*
+
+# FreeLLMAPI pre-sync DB snapshot (binary, machine-local)
+*.pre-or-sync
