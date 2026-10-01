@@ -13,6 +13,14 @@ if [ ! -d "$REPO/node_modules" ]; then
   exit 1
 fi
 
+# 1. Sync OpenRouter's free models into the FreeLLMAPI catalog.
+#    Runs BEFORE the already-running check on purpose: dsh-start calls this
+#    script on every boot, and FreeLLMAPI is usually already up, so an early
+#    exit here would skip the sync entirely. Non-fatal and rate-limited to 12h,
+#    so running it on every boot is cheap.
+echo "  ► Syncing OpenRouter free models..."
+python3 "$HOME/AI_SYSTEM/scripts/sync_openrouter_free_models.py" || true
+
 if curl -s --max-time 1 -H "Authorization: Bearer $FLLM_KEY" http://127.0.0.1:3001/v1/models &>/dev/null 2>&1; then
   echo "FreeLLMAPI already running at http://localhost:3001"
   exit 0
@@ -20,12 +28,6 @@ fi
 
 echo "Starting FreeLLMAPI..."
 mkdir -p "$HOME/.local/share/freellmapi"
-
-# 1. Sync OpenRouter's free models into the FreeLLMAPI catalog.
-#    Non-fatal: a dead network or a rotated key logs one line and the gateway
-#    still starts on the last-known-good catalog. Rate-limited to 12h.
-echo "  ► Syncing OpenRouter free models..."
-python3 "$HOME/AI_SYSTEM/scripts/sync_openrouter_free_models.py" || true
 
 # Start server (workspace)
 cd "$REPO"

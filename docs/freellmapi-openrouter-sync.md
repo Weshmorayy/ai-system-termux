@@ -138,6 +138,26 @@ Override the target DB for testing:
 FREELLMAPI_DB=/tmp/test.db python3 scripts/sync_openrouter_free_models.py --force
 ```
 
+### Startup order matters
+
+The sync lives in `scripts/freellmapi-start`, which `dsh-start` already invokes
+as its first step:
+
+```
+dsh-start
+  └─ freellmapi-start
+       ├─ sync_openrouter_free_models.py   ← must stay ABOVE this line
+       └─ exit 0 if the gateway is already up
+```
+
+`freellmapi-start` exits early when FreeLLMAPI is already listening. Since the
+usual entry point is `dsh-start` and the gateway is normally **already running**,
+the sync would be skipped on every boot if it sat below that check. Keep it above
+the `already running` early exit.
+
+Adding models to the database while the server runs is safe — the gateway reads
+its catalog from SQLite per request, so no restart is needed.
+
 ---
 
 ## Troubleshooting
