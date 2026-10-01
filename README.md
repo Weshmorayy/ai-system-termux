@@ -59,11 +59,15 @@ ai-health        # Provider availability check
 dsh-start        # Launch DSH web UI (also refreshes the OpenRouter model list)
 
 # OpenRouter model list
-node ~/.dsh/refresh-openrouter-models.mjs --force   # refresh now, skip the 12h rate limit
+node ~/.dsh/refresh-openrouter-models.mjs --force   # DSH: refresh now, skip the 12h rate limit
+python3 scripts/sync_openrouter_free_models.py --force   # FreeLLMAPI: sync free models now
 
 # FreeLLMAPI
 cd ~/freellmapi && npm run dev    # Start provider gateway (port 3001)
 ```
+
+Both syncs run automatically from `dsh-start` and are rate-limited to 12h.
+Open WebUI needs no script — its pipe re-fetches on its own hourly.
 
 ---
 

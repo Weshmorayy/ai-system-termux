@@ -63,8 +63,8 @@ same rule the Open WebUI OpenRouter pipe uses (`is_free_model`, bundled pipe
 line 19900).
 
 Checking the *price* rather than the `:free` suffix is what catches stealth
-models. As of this sync, 20 models are free, but only 16 carry a `:free` suffix.
-The 4 that do not are exactly the stealth-style ones:
+models. As of 2026-10-01, 21 models are free, but only 17 carry a `:free`
+suffix. The 4 that do not are exactly the stealth-style ones:
 
 ```
 stealth/space-bunny-alpha
