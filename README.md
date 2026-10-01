@@ -44,6 +44,7 @@ Google Groq Cerebras Mistral  NVIDIA   Cloudflare
 | Skills | ~/AI_SYSTEM/skills/ | Reusable agent skills |
 | Workflows | ~/AI_SYSTEM/workflows/ | Repeatable processes |
 | Scripts | ~/AI_SYSTEM/scripts/ | CLI tools |
+| OpenRouter refresh | ~/AI_SYSTEM/scripts/refresh-openrouter-models.mjs | Keeps the DSH OpenRouter model list current (see [docs](docs/openrouter-model-refresh.md)) |
 
 ---
 
@@ -54,11 +55,37 @@ ai-status        # System health overview
 ai-models        # Model table with benchmark data
 ai-quota         # Quota status per provider
 ai-health        # Provider availability check
-dsh-start        # Launch DeepSeek Harness web UI
+dsh-start        # Launch DSH web UI (also refreshes the OpenRouter model list)
+
+# OpenRouter model list
+node ~/.dsh/refresh-openrouter-models.mjs --force   # refresh now, skip the 12h rate limit
 
 # FreeLLMAPI
 cd ~/freellmapi && npm run dev    # Start provider gateway (port 3001)
 ```
+
+---
+
+## OpenRouter Model List (auto-refreshed)
+
+DSH only shows the models named in its config, so the OpenRouter route can drift
+out of date. `dsh-start` now keeps it current automatically.
+
+- **`openrouter` route** — serves the catalog frozen in `@earendil-works/pi-ai`
+  (~366 models) with full per-token cost, reasoning ladders, and per-model protocol.
+- **`openrouter-extra` route** — the ~120 live models that catalog *cannot* serve.
+  Self-heals: shrinks on its own as pi-ai catches up.
+- **`openrouter-images` route** — the ~55 image-generation models.
+- Refreshed at most once per 12h on boot; failures never block startup.
+
+**Why an explicit `models:` list breaks this:** in DSH, a `models:` list *replaces*
+the catalog rather than adding to it. Omit the list to serve the catalog; the UI's
+"Fetch available models" is also a dead end for OpenRouter because discovery
+short-circuits to the bundled snapshot
+([upstream #4469](https://github.com/deepseek-ai/deepseek-harness/discussions/4469)).
+
+Full architecture, accurate token/reasoning handling, and rollback:
+**[docs/openrouter-model-refresh.md](docs/openrouter-model-refresh.md)**.
 
 ---
 
@@ -69,6 +96,11 @@ cd ~/freellmapi && npm run dev    # Start provider gateway (port 3001)
 3. Add provider keys to FreeLLMAPI via its dashboard (http://localhost:5173)
 4. Add provider metadata to ~/AI_SYSTEM/providers/
 5. Update model registry: ai-models refresh
+
+> **Note (OpenRouter):** if you hand-write a `models:` list for OpenRouter in step 2,
+> it **replaces** the catalog and you will see only those models. For OpenRouter
+> leave the list off and let `dsh-start` maintain it — see
+> [docs/openrouter-model-refresh.md](docs/openrouter-model-refresh.md).
 
 ---
 
@@ -96,4 +128,4 @@ OCR + structured description → text model
 
 ---
 
-*Last updated: 2026-09-22*
+*Last updated: 2026-10-01*

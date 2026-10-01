@@ -23,7 +23,28 @@ echo "  ► FreeLLMAPI Repo:      https://github.com/Weshmorayy/freellmapi-termu
 echo "------------------------------------------------------------"
 echo ""
 
-# 2. Launch DSH web UI with --no-open to prevent unauthenticated browser popup.
+# 2. Refresh the OpenRouter model lists before booting.
+#    Non-fatal: a dead network or a rotated key logs a line and boots on the
+#    last-known-good list. Rate-limited to once per 12h unless --force-refresh.
+FORCE=""
+if [ "${1:-}" = "--force-refresh" ]; then
+  FORCE="yes"
+  shift
+fi
+
+echo ""
+echo "------------------------------------------------------------"
+echo "  ► Refreshing OpenRouter model lists..."
+echo "------------------------------------------------------------"
+echo ""
+
+if [ -n "$FORCE" ]; then
+  node "$HOME/.dsh/refresh-openrouter-models.mjs" --force || true
+else
+  node "$HOME/.dsh/refresh-openrouter-models.mjs" || true
+fi
+
+# 3. Launch DSH web UI with --no-open to prevent unauthenticated browser popup.
 #    Captures the authenticated token URL, displays it formatted, and opens it via termux-open-url.
 
 exec node --input-type=module - "$@" << 'JS_EOF'

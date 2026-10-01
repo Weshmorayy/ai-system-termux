@@ -6,3 +6,7 @@
 *secrets*
 .env
 .env.*
+
+# Local backup copies of tracked scripts (may embed inline defaults)
+*.bak
+*.bak-*
